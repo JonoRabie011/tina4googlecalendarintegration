@@ -1,0 +1,5 @@
+/secrets/
+/vendor/
+/.env
+/log/debug.log
+/src/public/libraries/
