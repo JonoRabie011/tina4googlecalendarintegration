@@ -3,3 +3,4 @@
 /.env
 /log/debug.log
 /src/public/libraries/
+.idea
