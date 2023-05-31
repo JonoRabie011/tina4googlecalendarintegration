@@ -8,8 +8,8 @@ $DBA = new \Tina4\DataFirebird($_ENV["DATABASE"], $_ENV["USERNAME"], $_ENV["PASS
 $accessToken = (new GoogleCalendarAuth())->getAccessToken("clientId", "1");
 
 $requestBody = new GoogleCalendarRequestBody([],[],"",
-                                             [ ["email" => "moeketsidominicdev@gmail.com", "displayName" => "Dominic_Moe"],
-                                               ["email" => "dominicmoeketsi@yahoo.com", "displayName" => "Dominic_M"]
+                                             [ ["email" => "", "displayName" => ""],
+                                               ["email" => "", "displayName" => ""]
                                              ]);
 
 $googleCalendarObj = new GoogleCalendarObject($accessToken, "clientId", "1", "moeketsidominic@gmail.com", "",
