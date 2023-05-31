@@ -1,0 +1,32 @@
+<div class="modal fade" id="promptConsent" tabindex="-1" aria-labelledby="promptConsentTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center">Make your experience better</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>You have not given consent to access to your Google Account Contacts</p>
+                <p>
+                    You can make your experience smoother by giving us consent to access your Google Contacts to enable
+                    adding guests from your contacts list.
+                </p>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12" id="feedBack"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="/google/calendar/integration/all/{{ linkKey }}/{{ linkValue }}" class="btn btn-primary">
+                    Continue
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#promptConsent').modal('show');
+</script>

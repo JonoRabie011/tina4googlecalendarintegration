@@ -12,8 +12,8 @@ class GoogleCalendarAuth extends Api
      */
     public string $redirectUri = "http://localhost:7145/google/calendar/get-access-token";
 
-    private $clientId = "69673761201-25rdbvfobqoteu06f4nh3nbt3d624a4k.apps.googleusercontent.com";
-    private $clientSecret = "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";
+    private $clientId = "851127021703-q87n1fjql7dneqo5giq823uqk7kka004.apps.googleusercontent.com";
+    private $clientSecret = "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";
 
     public function __construct($baseURL = "", $clientId = "", $clientSecret = "")
     {
@@ -31,39 +31,58 @@ class GoogleCalendarAuth extends Api
         {
             $this->clientSecret = $clientSecret;
         }
-//        parent::__construct($baseURL, $authHeader);
     }
 
 
-    public function getAccessToken($code)
-    {
-            $body = [
-                "client_id"=> $this->clientId,
-                "redirect_uri" => $this->redirectUri,
-                "client_secret" => $this->clientSecret,
-                "code"=>$code,
-                "grant_type"=>"authorization_code"
-            ];
-
-            return $this->sendRequest("/token", "POST",$body);
-    }
-
-    public function getRefreshAccessToken($accessToken)
+    public function createAccessToken($code)
     {
         $body = [
             "client_id"=> $this->clientId,
             "redirect_uri" => $this->redirectUri,
             "client_secret" => $this->clientSecret,
-            "refresh_token" => $accessToken,
+            "code"=>$code,
+            "grant_type"=>"authorization_code"
+        ];
+
+        return $this->sendRequest("/token", "POST",json_encode($body));
+    }
+
+    public function refreshAccessToken($refreshToken)
+    {
+        $body = [
+            "client_id"=> $this->clientId,
+            "redirect_uri" => $this->redirectUri,
+            "client_secret" => $this->clientSecret,
+            "refresh_token" => $refreshToken,
             "grant_type"=>"refresh_token"
         ];
 
-        return $this->sendRequest("/token", "POST",$body);
+        return $this->sendRequest("/token", "POST",json_encode($body));
+    }
+    public function getAccessToken($linkKey, $linkValue)
+    {
+        $googleCalendarSettings = new GoogleCalendarSettings();
+        $refreshToken = $googleCalendarSettings->getSettingsInformation($linkKey, $linkValue, "refresh_token");
+
+
+        $requestRefreshAccessToken = $this->refreshAccessToken($refreshToken);
+        if( !($requestRefreshAccessToken["httpCode"] == 200) ){
+            return false;
+        }
+        else{
+            $accessTokenBody = $requestRefreshAccessToken["body"];
+            $accessToken = $accessTokenBody["access_token"];
+            $description  = $googleCalendarSettings->getAuthScopeDescription($accessTokenBody["scope"]);
+
+            $googleCalendarSettings->saveSettingsInformation($linkKey, $linkValue, "access_token", $accessToken, $description);
+
+            return $accessToken;
+        }
     }
 
-    public function getOAuthUri($linkDataForSql = ""): string
+    public function getOAuthUri($linkDataForSql = "", $authUrl = ""): string
     {
-        $authScope = urlencode('https://www.googleapis.com/auth/calendar');
+        $authScope = urlencode($authUrl);
         $redirectEncoded = urlencode($this->redirectUri);
 
         $authLink = $this->baseURL."/auth?scope={$authScope}&redirect_uri={$redirectEncoded}&response_type=code&client_id={$this->clientId}&access_type=offline";
@@ -75,5 +94,4 @@ class GoogleCalendarAuth extends Api
 
         return $authLink;
     }
-
 }
