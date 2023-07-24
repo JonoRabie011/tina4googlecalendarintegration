@@ -21,9 +21,6 @@
         <div id="eventsList" class="row">
         </div>
     </div>
-    {% if promptLinkContacts %}
-        {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
-    {% endif %}
     <script>
         function fetchEvents(){
             showSpinner('eventsList');

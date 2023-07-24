@@ -66,6 +66,7 @@ class GoogleCalendarAuth extends Api
 
 
         $requestRefreshAccessToken = $this->refreshAccessToken($refreshToken);
+
         if( !($requestRefreshAccessToken["httpCode"] == 200) ){
             return false;
         }

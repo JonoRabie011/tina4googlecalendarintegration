@@ -66,18 +66,16 @@
                 {% endif %}
 
                 <div class="row mt-3">
-                    <button class="btn btn-primary"
-                            onclick="eventDetails('{{ calendarId }}', '{{ event.id }}', '{{ linkKey }}', '{{ linkValue }}')"
+                    <a href="/google/events/get/{{ calendarId }}/{{ event.id }}/{{ linkKey }}/{{ linkValue }}"
+                       class="btn btn-primary"
                     >
                         Details
-                    </button>
+                    </a>
                 </div>
 
             </div>
 {#        </a>#}
     {% endfor %}
-
-    {% include "google-calendar-integration/components/event-details.twig" %}
 
     <script>
 

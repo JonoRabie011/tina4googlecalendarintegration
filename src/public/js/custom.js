@@ -54,33 +54,3 @@ function showSpinner(targetDiv,show=true){
         $('#' + targetDiv).html('');
     }
 }
-
-function eventDetails(calendarId, eventId, linkKey, linkValue){
-    // alert('clicked');
-    $('#eventDetails').modal('show');
-    showSpinner('eventDetails .modal-body');
-    // // let data = getFormData('moeketsidominic@gmail.com65h62phg6sr34b9gc9gj8b9kchj3ab9p69i3ab9jchhm8p346hhj2d336c');
-    // let url = '/google/events/get/'+calendarId+'/'+eventId+'/'+linkKey+'/'+linkValue;
-    // $.ajax({
-    //     method: 'POST',
-    //     url: url,
-    //     data: 'calendarId='+calendarId+'&eventId='+eventId,
-    //     processData: false,
-    //     contentType: false
-    // }).done(function (data) {
-    //     // modalBodyContent.html(data.message);
-    //     // primaryButton.html('Confirm');
-    //     // primaryButton.prop("disabled", false);
-    //     // let originalOnclick = primaryButton.attr('onclick');
-    //     // let onClick = 'saveActionForm(\''+formName + '\',' + '\'/folder/delete/true\',\'' + targetDiv + '\',\'' + modal + '\')';
-    //     // primaryButton.attr('onclick', onClick);
-    //     // $('#' + modal).on('hide.bs.modal', function () {
-    //     //     primaryButton.html('Delete Folder');
-    //     //     primaryButton.attr('onclick', originalOnclick);
-    //     // });
-    //     console.log(data);
-    // });
-    saveForm(calendarId + eventId,
-             '/google/events/get/'+calendarId+'/'+eventId+'/'+linkKey+'/'+linkValue,
-             'eventDetails .modal-body');
-}
