@@ -23,7 +23,8 @@ class GoogleCalendarSettings
         return $description;
     }
 
-    public function saveSettingsInformation($linkKey, $linkValue, $metaKey, $metaValue, $description){
+    public function saveSettingsInformation($linkKey, $linkValue, $metaKey, $metaValue, $description): void
+    {
         if( !((new GoogleCalendarIntegrationORM())
                     ->load("name = 'tina4googlecalendarintegration' 
                             and link_key = '{$linkKey}' and link_value = '{$linkValue}'
