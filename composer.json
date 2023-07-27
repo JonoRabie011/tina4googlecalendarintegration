@@ -1,6 +1,9 @@
 {
     "require": {
-        "tina4stack/tina4php": "^2.0"
+        "tina4stack/tina4php": "^2.0",
+        "tina4stack/tina4php-firebird": "^2.0",
+        "tina4stack/tina4php-database": "^2.0",
+        "nesbot/carbon": "^2.67"
     },
     "scripts": {
         "tina4": "tina4",

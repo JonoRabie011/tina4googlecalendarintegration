@@ -1,0 +1,78 @@
+{% extends "base.twig" %}
+{% block content %}
+    <div class="d-flex justify-content-center">
+        <div>
+            <div class="mb-3">
+                <h4>Create A Calendar Event</h4>
+            </div>
+            <form method="POST" id="create-event-form" action="/google/calendar/create-event/{{ linkKey }}/{{ linkValue }}">
+                <div class="mb-3">
+                    <label for="eventTitle" class="form-label">Add title</label>
+                    <input id="eventTitle" type="text" class="form-control" placeholder="Add title" name="eventTitle" required>
+                    <label id="eventTitle-error" class="error text-danger" for="eventTitle"></label>
+                </div>
+                <div class="mb-3">
+                    <label for="eventDescription" class="form-label">Optional description</label>
+                    <input id="eventDescription" type="text" class="form-control" placeholder="Add title" name="eventDescription">
+                </div>
+                <div class="mb-3">
+                    <label for="dateTimeStart" class="form-label">Starts on</label>
+                    <input id="dateTimeStart" type="text" class="form-control" placeholder="Add title" name="dateTimeStart">
+                </div>
+                <div class="mb-3">
+                    <label for="dateTimeEnd" class="form-label">Until</label>
+                    <input id="dateTimeEnd" type="text" class="form-control" placeholder="Add title" name="dateTimeEnd">
+                </div>
+                <div class="mb-3">
+                    <label for="eventGuests" class="form-label">Add guests</label>
+                    <select id="eventGuests" name="eventGuests[]" class="form-select p-0" onchange=""
+                            placeholder="Search to add guests" multiple>
+                        <option value=""></option>
+                        {% for contact in contactList %}
+                            <option value="{{ contact }}">{{ contact }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="eventRecurrence" class="form-label">Recurrence</label>
+                    <select id="eventRecurrence" name="eventRecurrence" class="form-control" onchange="">
+                        <option selected disabled>Select</option>
+                        <option value="RRULE:FREQ=DAILY">Daily</option>
+                        <option value="RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE">Every weekday (Monday to Friday)</option>
+                        <option value="RRULE:FREQ=WEEKLY">Weekly</option>
+                        <option value="RRULE:FREQ=MONTHLY">Monthly</option>
+                        <option value="RRULE:FREQ=YEARLY">Anually</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="eventLocation" class="form-label">Add a location</label>
+                    <input id="eventLocation" type="text" class="form-control" placeholder="Add a location"
+                           name="eventLocation"
+                    >
+                </div>
+                <div class="mb-3 justify-content-start">
+                    <label for="addMeetingToEvent" class="form-label">
+                        <input id="addMeetingToEvent" type="checkbox" class="form-control" name="addMeetingToEvent"
+                               value="true"
+                        >
+                        Add a virtual Google Meeting to event?
+                    </label>
+                </div>
+                <div class="mb-3">
+                    {% include "google-calendar-integration/components/calendar-list.twig" with {calendars: calendars} %}
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-success">Create</button>
+                </div>
+                <input type="hidden" id="timeZone" name="timeZone">
+                {{ "create-event-form" | formToken | raw }}
+            </form>
+        </div>
+    </div>
+    {% if promptLinkContacts %}
+        {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
+    {% endif %}
+    <script>
+
+    </script>
+{% endblock %}
