@@ -1,0 +1,9 @@
+<label for="eventCalendar" class="form-label">Select a calendar</label>
+<select id="eventCalendar" name="eventCalendar" class="form-control" required>
+    <option selected disabled>Select a calendar</option>
+    {% for calendar in calendars %}
+        <option value="{{ calendar.id }}" {{ calendar.primary == '1' ? 'selected' : '' }}>
+            {{ calendar.summary }}
+        </option>
+    {% endfor %}
+</select>

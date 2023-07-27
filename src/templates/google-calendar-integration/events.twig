@@ -1,0 +1,30 @@
+{% extends "base.twig" %}
+{% block content %}
+    <div class="d-flex justify-content-center">
+        <div class="">
+            <div class="mb-3">
+                <h4>List Events</h4>
+            </div>
+            <form id="get-events-form">
+                <div class="mb-3">
+                    {% include "google-calendar-integration/components/calendar-list.twig" with {calendars: calendars} %}
+                </div>
+                <input type="hidden" id="timeZone" name="timeZone" value="{{ linkValue }}">
+                {{ "get-events-form" | formToken | raw }}
+            </form>
+            <div class="mb-3">
+                <button class="btn btn-success" onclick="fetchEvents()">Fetch</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="eventsList" class="row">
+        </div>
+    </div>
+    <script>
+        function fetchEvents(){
+            showSpinner('eventsList');
+            saveForm("get-events-form","/google/events/list/{{ linkKey }}/{{ linkValue }}","eventsList");
+        }
+    </script>
+{% endblock %}
