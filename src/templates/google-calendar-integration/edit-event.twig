@@ -1,112 +1,115 @@
-{% extends "base.twig" %}
-{% block content %}
-    <div class="d-flex justify-content-center">
-        <div>
-            <div class="mb-3">
-                <h4>Edit A Calendar Event</h4>
-            </div>
-            <form method="POST" id="edit-event-form"
-                  action="/google/calendar/edit-event/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}"
+<div class="row mb-3">
+    <h4>Edit A Calendar Event</h4>
+</div>
+<div class="row mb-3">
+    <a class="btn btn-primary" onclick="loadPage('/google/events/list/{{ linkKey }}/{{ linkValue }}','content')">
+        Back To List Events
+    </a>
+</div>
+<div id="edit-event-content">
+    <form id="edit-event-form">
+        <div class="mb-3">
+            <label for="eventTitle" class="form-label">Add title</label>
+            <input id="eventTitle" type="text" class="form-control" placeholder="Add title" name="eventTitle"
+                   value="{{ event.summary }}" required
             >
-                <div class="mb-3">
-                    <label for="eventTitle" class="form-label">Add title</label>
-                    <input id="eventTitle" type="text" class="form-control" placeholder="Add title" name="eventTitle"
-                           value="{{ event.summary }}" required
-                    >
-                    <label id="eventTitle-error" class="error text-danger" for="eventTitle"></label>
-                </div>
-                <div class="mb-3">
-                    <label for="eventDescription" class="form-label">Optional description</label>
-                    <input id="eventDescription" type="text" class="form-control" placeholder="Add title"
-                           name="eventDescription" value="{{ event.description }}"
-                    >
-                </div>
-                <div class="mb-3">
-                    <label for="eventDateTimeStart" class="form-label">Starts on</label>
-                    <input id="eventDateTimeStart" type="text" class="form-control" placeholder="Add title" name="dateTimeStart"
-                           value="{{ event.start.dateTime }}"
-                    >
-                </div>
-                <div class="mb-3">
-                    <label for="dateTimeEnd" class="form-label">Until</label>
-                    <input id="dateTimeEnd" type="text" class="form-control" placeholder="Add title" name="dateTimeEnd"
-                           value="{{ event.end.dateTime }}"
-                    >
-                </div>
-                <div class="mb-3">
-                    <label for="eventGuests" class="form-label">Add guests</label>
-                    <select id="eventGuests" name="eventGuests[]" class="form-select p-0" onchange=""
-                            placeholder="Search to add guests" multiple>
-                        <option value=""></option>
-                        {% for contact in contactList %}
-                            {% if event.attendees %}
-                                {% for attendee in event.attendees %}
-                                    {% if attendee.email == contact %}
-                                        <option value="{{ contact }}" selected>{{ contact }}</option>
-                                    {% else %}
-                                        <option value="{{ contact }}">{{ contact }}</option>
-                                    {% endif %}
-                                {% endfor %}
+            <label id="eventTitle-error" class="error text-danger" for="eventTitle"></label>
+        </div>
+        <div class="mb-3">
+            <label for="eventDescription" class="form-label">Optional description</label>
+            <input id="eventDescription" type="text" class="form-control" placeholder="Add title"
+                   name="eventDescription" value="{{ event.description }}"
+            >
+        </div>
+        <div class="mb-3">
+            <label for="eventDateTimeStart" class="form-label">Starts on</label>
+            <input id="eventDateTimeStart" type="text" class="form-control" placeholder="Add title" name="dateTimeStart"
+                   value="{{ event.start.dateTime }}"
+            >
+        </div>
+        <div class="mb-3">
+            <label for="dateTimeEnd" class="form-label">Until</label>
+            <input id="dateTimeEnd" type="text" class="form-control" placeholder="Add title" name="dateTimeEnd"
+                   value="{{ event.end.dateTime }}"
+            >
+        </div>
+        <div class="mb-3">
+            <label for="eventGuests" class="form-label">Add guests</label>
+            <select id="eventGuests" name="eventGuests[]" class="form-select p-0" onchange=""
+                    placeholder="Search to add guests" multiple>
+                <option value=""></option>
+                {% for contact in contactList %}
+                    {% if event.attendees %}
+                        {% for attendee in event.attendees %}
+                            {% if attendee.email == contact %}
+                                <option value="{{ contact }}" selected>{{ contact }}</option>
                             {% else %}
                                 <option value="{{ contact }}">{{ contact }}</option>
                             {% endif %}
                         {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="eventRecurrence" class="form-label">Recurrence</label>
-                    <select id="eventRecurrence" name="eventRecurrence" class="form-control" onchange="">
-                        <option selected disabled>Select</option>
-                        <option value="RRULE:FREQ=DAILY" {{ event.recurrence.0 == 'RRULE:FREQ=DAILY' ? 'selected' : '' }} >Daily</option>
-                        <option value="RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE"
-                                {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE' ? 'selected' : '' }}
-                        >
-                            Every weekday (Monday to Friday)
-                        </option>
-                        <option value="RRULE:FREQ=WEEKLY" {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY' ? 'selected' : '' }} >Weekly</option>
-                        <option value="RRULE:FREQ=MONTHLY" {{ event.recurrence.0 == 'RRULE:FREQ=MONTHLY' ? 'selected' : '' }}  >Monthly</option>
-                        <option value="RRULE:FREQ=YEARLY" {{ event.recurrence.0 == 'RRULE:FREQ=YEARLY' ? 'selected' : '' }}  >Anually</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="eventLocation" class="form-label">Add a location</label>
-                    <input id="eventLocation" type="text" class="form-control" placeholder="Add a location"
-                           name="eventLocation" value="{{ event.location }}"
-                    >
-                </div>
-                <div class="mb-3 justify-content-start">
-                    <label for="addMeetingToEvent" class="form-label">
-                        <input id="addMeetingToEvent" type="checkbox" class="form-control" name="addMeetingToEvent"
-                               value="true"
-                               {% if event.conferenceData.createRequest.status.statusCode == "success" %}
-                                    checked
-                               {% endif %}
-                        >
-                        Add a virtual Google Meeting to event?
-                    </label>
-                    {% if event.conferenceData %}
-                        <input type="hidden" name="createRequestId" value="{{ event.conferenceData.createRequest.requestId }}">
-                        <input type="hidden" name="conferenceSolutionKeyType" value="{{ event.conferenceData.createRequest.requestId }}">
+                    {% else %}
+                        <option value="{{ contact }}">{{ contact }}</option>
                     {% endif %}
-                </div>
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-success">Update</button>
-                </div>
-                {{ "edit-event-form" | formToken | raw }}
-            </form>
-            <form method="POST" id="delete-event-form"
-                  action="/google/event/delete/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}">
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-success">Delete</button>
-                </div>
-                {{ "delete-event-form" | formToken | raw }}
-            </form>
+                {% endfor %}
+            </select>
         </div>
-    </div>
-    {% if promptLinkContacts %}
-        {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
-    {% endif %}
-    <script>
+        <div class="mb-3">
+            <label for="eventRecurrence" class="form-label">Recurrence</label>
+            <select id="eventRecurrence" name="eventRecurrence" class="form-control" onchange="">
+                <option selected disabled>Select</option>
+                <option value="RRULE:FREQ=DAILY" {{ event.recurrence.0 == 'RRULE:FREQ=DAILY' ? 'selected' : '' }} >Daily</option>
+                <option value="RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE"
+                        {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE' ? 'selected' : '' }}
+                >
+                    Every weekday (Monday to Friday)
+                </option>
+                <option value="RRULE:FREQ=WEEKLY" {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY' ? 'selected' : '' }} >Weekly</option>
+                <option value="RRULE:FREQ=MONTHLY" {{ event.recurrence.0 == 'RRULE:FREQ=MONTHLY' ? 'selected' : '' }}  >Monthly</option>
+                <option value="RRULE:FREQ=YEARLY" {{ event.recurrence.0 == 'RRULE:FREQ=YEARLY' ? 'selected' : '' }}  >Anually</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="eventLocation" class="form-label">Add a location</label>
+            <input id="eventLocation" type="text" class="form-control" placeholder="Add a location"
+                   name="eventLocation" value="{{ event.location }}"
+            >
+        </div>
+        <div class="mb-3 justify-content-start">
+            <label for="addMeetingToEvent" class="form-label">
+                <input id="addMeetingToEvent" type="checkbox" class="form-check" name="addMeetingToEvent"
+                       value="true"
+                       {% if event.conferenceData.createRequest.status.statusCode == "success" %}
+                            checked
+                       {% endif %}
+                >
+                Add a virtual Google Meeting to event?
+            </label>
+            {% if event.conferenceData %}
+                <input type="hidden" name="createRequestId" value="{{ event.conferenceData.createRequest.requestId }}">
+                <input type="hidden" name="conferenceSolutionKeyType" value="{{ event.conferenceData.createRequest.requestId }}">
+            {% endif %}
+        </div>
+        {{ "edit-event-form" | formToken | raw }}
+    </form>
 
-    </script>
-{% endblock %}
+    <div class="mb-3">
+        <button type="submit" class="btn btn-success"
+                onclick="saveForm('edit-event-form','/google/calendar/edit-event/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}',
+                                  'edit-event-content4444')"
+        >
+            Update
+        </button>
+    </div>
+    <div class="mb-3">
+        <button type="button" class="btn btn-success"
+                onclick="saveForm('delete-event-form','/google/event/delete/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}',
+                                  'edit-event-content')"
+        >
+            Delete
+        </button>
+    </div>
+</div>
+<div id="edit-event-content4444"></div>
+{% if promptLinkContacts %}
+    {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
+{% endif %}
