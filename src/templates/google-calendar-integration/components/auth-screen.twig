@@ -1,10 +1,11 @@
-<div class="container">
-    <div class="row">
-        <a tabindex="0" class="btn btn-block btn-outline-light d-flex align-items-center ng-tns-c75-1"
-           href="{{ authLink }}">
-            <img class="" src="/src/public/images/icons/icon-google.svg"
-                 alt="google-icon">
-            <span class=""> Authorize Google Account </span>
-        </a>
+{% extends "base.twig" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <a class="btn btn-outline-primary" href="{{ authLink }}">
+                <img class="" src="/src/public/images/icons/icon-google.svg" alt="google-icon">
+                Authorize Access To Your Google Account
+            </a>
+        </div>
     </div>
-</div>
+{% endblock %}
