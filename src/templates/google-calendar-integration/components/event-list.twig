@@ -4,80 +4,69 @@
     </div>
 {% else %}
     {% for event in events %}
-{#        <a onclick="eventDetails({{ calendarId }}, {{ event.id }})">#}
-            <form id="{{ calendarId ~ event.id }}">
-                <input type="hidden" name="calendarId" value="{{ calendarId }}">
-                <input type="hidden" name="eventId" value="{{ event.id }}">
-            </form>
-            <div class="col-12 col-sm-6 col-md-4 border px-3">
-                {% if event.summary %}
-                    <div class="row">
-                        <div class="d-inline col-2">
-                            <i class="fa fa-sticky-note" aria-hidden="true"></i>
-                        </div>
-                        <div class="d-inline col-10">
-                            <h5>{{ event.summary }}</h5>
-                        </div>
-                    </div>
-                {% endif %}
-
-                {% if event.description %}
-                    <div class="row">
-                        <div class="d-inline col-2">
-                            <i class="fa fa-comments" aria-hidden="true"></i>
-                        </div>
-                        <div class="d-inline col-10">
-                            <h5 class="overflow-hidden">{{ event.description | raw }}</h5>
-                        </div>
-                    </div>
-                {% endif %}
-
+        <div class="col-12 col-sm-6 col-md-4 border px-3">
+            {% if event.summary %}
                 <div class="row">
                     <div class="d-inline col-2">
-                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <i class="fa fa-sticky-note" aria-hidden="true"></i>
                     </div>
                     <div class="d-inline col-10">
-                        <p>{{ event.start.dateTime }} to {{ event.end.dateTime }}</p>
+                        <h5>{{ event.summary }}</h5>
                     </div>
                 </div>
+            {% endif %}
 
-                {% if event.location %}
-                    <div class="row">
-                        <div class="d-inline col-2">
-                            <i class="fa fa-map-pin" aria-hidden="true"></i>
-                        </div>
-                        <div class="d-inline col-10">
-                            <p>{{ event.location }}</p>
-                        </div>
+            {% if event.description %}
+                <div class="row">
+                    <div class="d-inline col-2">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
                     </div>
-                {% endif %}
-
-                {% if event.attendees %}
-                    <div class="row">
-                       <div class="d-inline col-2">
-                           <i class="fa fa-users" aria-hidden="true"></i>
-                       </div>
-                       <div class="d-inline col-10">
-                           {% for guest in event.attendees %}
-                                <span>{{ guest.email }}</span>
-                           {% endfor %}
-                       </div>
+                    <div class="d-inline col-10">
+                        <h5 class="overflow-hidden">{{ event.description | raw }}</h5>
                     </div>
-                {% endif %}
-
-                <div class="row mt-3">
-                    <a href="/google/events/get/{{ calendarId }}/{{ event.id }}/{{ linkKey }}/{{ linkValue }}"
-                       class="btn btn-primary"
-                    >
-                        Details
-                    </a>
                 </div>
+            {% endif %}
 
+            <div class="row">
+                <div class="d-inline col-2">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                </div>
+                <div class="d-inline col-10">
+                    <p>{{ event.start.dateTime }} to {{ event.end.dateTime }}</p>
+                </div>
             </div>
-{#        </a>#}
+
+            {% if event.location %}
+                <div class="row">
+                    <div class="d-inline col-2">
+                        <i class="fa fa-map-pin" aria-hidden="true"></i>
+                    </div>
+                    <div class="d-inline col-10">
+                        <p>{{ event.location }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if event.attendees %}
+                <div class="row">
+                   <div class="d-inline col-2">
+                       <i class="fa fa-users" aria-hidden="true"></i>
+                   </div>
+                   <div class="d-inline col-10">
+                       {% for guest in event.attendees %}
+                            <span>{{ guest.email }}</span>
+                       {% endfor %}
+                   </div>
+                </div>
+            {% endif %}
+
+            <div class="row mt-3">
+                <a class="btn btn-primary"
+                   onclick="loadCalendarEvent('/google/events/get/{{ calendarId }}/{{ event.id }}/{{ linkKey }}/{{ linkValue }}')"
+                >
+                    Details
+                </a>
+            </div>
+        </div>
     {% endfor %}
-
-    <script>
-
-    </script>
 {% endif %}
