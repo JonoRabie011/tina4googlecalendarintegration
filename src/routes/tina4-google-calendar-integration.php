@@ -355,7 +355,7 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if($request->params["addMeetingToEvent"]){
+    if(isset($request->params["addMeetingToEvent"])){
         $createRequest = [
             "createRequest" => [
                 "conferenceSolutionKey" => [
