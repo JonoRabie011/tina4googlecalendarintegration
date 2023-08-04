@@ -41,6 +41,36 @@ $(function() {
             $('#eventGuests-selectized').focus();
         }
     });
+
+
+
+    $('#get-events-form #dateTimeStart').daterangepicker({
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        showDropdowns: true,
+        minYear: 2023,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        startDate: moment().startOf('day'),
+        locale: {
+            format: 'dddd, MMM DD HH:mm'
+        }
+    });
+
+    $('#get-events-form #dateTimeEnd').daterangepicker({
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        showDropdowns: true,
+        minYear: 2023,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        startDate: moment().startOf('day').add(1439, 'minutes'),       //until 23:59 the same day
+        locale: {
+            format: 'dddd, MMM DD HH:mm'
+        }
+    });
+
+    $('#get-events-form #timeZone').val(Intl.DateTimeFormat().resolvedOptions().timeZone);
 });
 
 
