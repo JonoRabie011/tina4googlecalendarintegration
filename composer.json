@@ -1,4 +1,7 @@
 {
+    "name": "tina4components/tina4googlecalendarintegration",
+    "description": "This is a package that will allow you to add Google Calendar functionality to any tin4 project",
+    "license": "MIT",
     "require": {
         "tina4stack/tina4php": "^2.0",
         "tina4stack/tina4php-firebird": "^2.0",
@@ -15,12 +18,12 @@
         "start-service": "@tina4service"
     },
     "classmap": [
-        "src/*",
-        "src/app/*",
-        "src/orm/*",
-        "src/routes/*"
+        "src/*"
     ],
     "autoload": {
+        "files": [
+            "loadModule.php"
+        ],
         "psr-4": {
             "\\": [
                 "src/",
