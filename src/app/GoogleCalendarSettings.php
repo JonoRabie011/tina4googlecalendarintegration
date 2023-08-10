@@ -23,13 +23,11 @@ class GoogleCalendarSettings
         return $description;
     }
 
-    public function saveSettingsInformation($linkKey, $linkValue, $metaKey, $metaValue, $description): void
-    {
-        if( !((new GoogleCalendarIntegrationORM())
-                    ->load("name = 'tina4googlecalendarintegration' 
-                            and link_key = '{$linkKey}' and link_value = '{$linkValue}'
-                            and meta_key = '{$metaKey}'"))
-        )
+    public function saveSettingsInformation($linkKey, $linkValue, $metaKey, $metaValue, $description){
+        if( !($integrationORMObject = (new GoogleCalendarIntegrationORM())
+                                            ->load("name = 'tina4googlecalendarintegration' 
+                                                            and link_key = '{$linkKey}' and link_value = '{$linkValue}'
+                                                            and meta_key = '{$metaKey}'")))
         {
             $integrationORMObject = new GoogleCalendarIntegrationORM();
             $integrationORMObject->name = "tina4googlecalendarintegration";
@@ -37,9 +35,9 @@ class GoogleCalendarSettings
             $integrationORMObject->linkValue = $linkValue;
             $integrationORMObject->metaKey = $metaKey;
             $integrationORMObject->description = $description;
-            $integrationORMObject->metaValue = $metaValue;
-            $integrationORMObject->save();
         }
+        $integrationORMObject->metaValue = $metaValue;
+        $integrationORMObject->save();
     }
 
     public function getSettingsInformation($linkKey, $linkValue, $metaKey){

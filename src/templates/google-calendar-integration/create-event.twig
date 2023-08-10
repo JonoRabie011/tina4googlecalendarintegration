@@ -1,11 +1,11 @@
 {% extends "base.twig" %}
 {% block content %}
     <div class="d-flex justify-content-center">
-        <div>
+        <div id="create-event-content">
             <div class="mb-3">
                 <h4>Create A Calendar Event</h4>
             </div>
-            <form method="POST" id="create-event-form" action="/google/calendar/create-event/{{ linkKey }}/{{ linkValue }}">
+            <form id="create-event-form">
                 <div class="mb-3">
                     <label for="eventTitle" class="form-label">Add title</label>
                     <input id="eventTitle" type="text" class="form-control" placeholder="Add title" name="eventTitle" required>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="mb-3 justify-content-start">
                     <label for="addMeetingToEvent" class="form-label">
-                        <input id="addMeetingToEvent" type="checkbox" class="form-control" name="addMeetingToEvent"
+                        <input id="addMeetingToEvent" type="checkbox" class="form-check" name="addMeetingToEvent"
                                value="true"
                         >
                         Add a virtual Google Meeting to event?
@@ -61,18 +61,20 @@
                 <div class="mb-3">
                     {% include "google-calendar-integration/components/calendar-list.twig" with {calendars: calendars} %}
                 </div>
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-success">Create</button>
-                </div>
                 <input type="hidden" id="timeZone" name="timeZone">
                 {{ "create-event-form" | formToken | raw }}
             </form>
+            <div class="mb-3">
+                <button type="button" class="btn btn-success"
+                        onclick="saveForm('create-event-form','/google/calendar/create-event/{{ linkKey }}/{{ linkValue }}',
+                                          'create-event-content')"
+                >
+                    Create
+                </button>
+            </div>
         </div>
     </div>
     {% if promptLinkContacts %}
         {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
     {% endif %}
-    <script>
-
-    </script>
 {% endblock %}

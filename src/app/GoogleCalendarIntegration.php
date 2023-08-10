@@ -171,6 +171,7 @@ class GoogleCalendarIntegration extends \Tina4\Api
         $this->authHeader = "Authorization: Bearer " . $accessToken;
         $result =  $this->sendRequest("/{$calendarId}/events/{$eventId}");
 
+
         if($result["httpCode"] == 200)
         {
             return $result["body"];
@@ -287,12 +288,14 @@ class GoogleCalendarIntegration extends \Tina4\Api
         {
             $this->baseURL = "https://people.googleapis.com";
             $this->authHeader = "Authorization: Bearer " . $accessToken;
-            $contacts = $this->sendRequest("/v1/otherContacts?readMask=names,emailAddresses")["body"]["otherContacts"];
+            $contacts = $this->sendRequest("/v1/otherContacts?readMask=names,emailAddresses");
 
-            foreach ($contacts as $contact)
-            {
-                foreach ($contact["emailAddresses"] as $contactNode){
-                    $contactList[] = $contactNode["value"];
+            if($contacts["httpCode"] == 200){
+                foreach ($contacts["body"]["otherContacts"] as $contact)
+                {
+                    foreach ($contact["emailAddresses"] as $contactNode){
+                        $contactList[] = $contactNode["value"];
+                    }
                 }
             }
         }

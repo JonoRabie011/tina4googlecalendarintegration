@@ -90,7 +90,11 @@ Get::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($linkK
      */
     if( ! ($accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue)) ) {
         setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
-        \Tina4\redirect("/google/calendar/integration/all/{$linkKey}/{$linkValue}");
+
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     if( $contactList = (new GoogleCalendarIntegration())->getContactList($linkKey, $linkValue, $accessToken) ){
@@ -103,7 +107,11 @@ Get::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($linkK
 
     if( !( $calendars = (new GoogleCalendarIntegration())->getCalendarList($linkKey, $linkValue, $accessToken) ) ) {
         setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
-        \Tina4\redirect("/google/calendar/integration/all/{$linkKey}/{$linkValue}");
+
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     return $response(\Tina4\renderTemplate("/google-calendar-integration/create-event.twig",
@@ -234,12 +242,19 @@ Get::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $linkV
     if( ! ($accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue)) )
     {
         setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
-        \Tina4\redirect("/google/calendar/integration/all/{$linkKey}/{$linkValue}");
+
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
     else if( !( $calendars = (new GoogleCalendarIntegration())->getCalendarList($linkKey, $linkValue, $accessToken) ) )
     {
         setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
-        \Tina4\redirect("/google/calendar/integration/all/{$linkKey}/{$linkValue}");
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     return $response(\Tina4\renderTemplate("google-calendar-integration/events.twig",
@@ -299,7 +314,11 @@ Get::add("/google/events/get/{calendarId}/{eventId}/{linkKey}/{linkValue}",
 
     if($error){
         setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
-        \Tina4\redirect("/google/calendar/integration/all/{$linkKey}/{$linkValue}");
+
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     return $response(renderTemplate("/google-calendar-integration/edit-event.twig", ["event" => $event,
@@ -336,7 +355,7 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if($request->params["addMeetingToEvent"]){
+    if(isset($request->params["addMeetingToEvent"])){
         $createRequest = [
             "createRequest" => [
                 "conferenceSolutionKey" => [
