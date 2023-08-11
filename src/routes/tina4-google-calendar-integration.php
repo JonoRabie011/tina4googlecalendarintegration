@@ -226,9 +226,17 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
                                                         $linkKey, $linkValue) )
     {
         $message = "Event created.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
     }
     else {
         $message = "Failed to create event";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     return $response($message, HTTP_OK, TEXT_HTML);
