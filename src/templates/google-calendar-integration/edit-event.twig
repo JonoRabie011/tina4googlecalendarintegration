@@ -56,7 +56,7 @@
         <div class="mb-3">
             <label for="eventRecurrence" class="form-label">Recurrence</label>
             <select id="eventRecurrence" name="eventRecurrence" class="form-control" onchange="">
-                <option selected disabled>Select</option>
+                <option selected disabled value="">Select</option>
                 <option value="RRULE:FREQ=DAILY" {{ event.recurrence.0 == 'RRULE:FREQ=DAILY' ? 'selected' : '' }} >Daily</option>
                 <option value="RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE"
                         {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE' ? 'selected' : '' }}
