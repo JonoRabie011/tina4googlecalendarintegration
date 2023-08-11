@@ -275,6 +275,12 @@ Get::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $linkV
  */
 Post::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $linkValue, Response $response, Request $request)
 {
+    $googleCalendarIntegration = new GoogleCalendarIntegration();
+    $request->params["timeZone"] = $googleCalendarIntegration->getTimeZoneOffset($request->params["timeZone"]);
+    $timeStamps = $googleCalendarIntegration->convertTimeStamp(["dateTimeStart" => $request->params["dateTimeStart"],
+                                                                "dateTimeEnd" => $request->params["dateTimeEnd"]],
+                                                                $request->params["timeZone"]);
+
     $events = [];
     if( ! ($accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue)) ) {
         $error = "Authentication failed, please reload page to continue.";
