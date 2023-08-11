@@ -177,7 +177,7 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
         ];
 
 
-    if(!empty($request->params["eventGuests"])){
+    if(!empty($request->params["eventGuests"]["0"])){
         foreach ($request->params["eventGuests"] as $guestEmail) {
             $attendees[] = [
                 "additionalGuests" => 0,
@@ -415,7 +415,7 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
     }
 
 
-    if(!empty($request->params["eventGuests"])){
+    if(!empty($request->params["eventGuests"]["0"])){
         foreach ($request->params["eventGuests"] as $guestEmail) {
             $attendees[] = [
                 "additionalGuests" => 0,
