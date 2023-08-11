@@ -153,7 +153,7 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if(isset($request->params["addMeetingToEvent"])){
+    if($request->params["addMeetingToEvent"]){
         $calendarData = $googleCalendarIntegration->getCalendarData($accessToken, $request->params["eventCalendar"]);
         if(!$calendarData["error"]){
             $uniqueId = uniqid($request->params["eventCalendar"].date("Y-m-d H:i:s"));
@@ -372,20 +372,47 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if(isset($request->params["addMeetingToEvent"])){
-        $createRequest = [
-            "createRequest" => [
-                "conferenceSolutionKey" => [
-                    "type" => $request->params["conferenceSolutionKeyType"]
+    if($request->params["addMeetingToEvent"]){
+        if (isset($request->params["entryPointsEntryPointType"]))
+        {
+            $conferenceData = [
+                "entryPoints" => [
+                    "0" => [
+                        "entryPointType" => $request->params["entryPointsEntryPointType"],
+                        "uri" => $request->params["entryPointsUri"],
+                        "label" => $request->params["entryPointsLabel"],
+                    ]
                 ],
-                "requestId" => $request->params["createRequestId"]
-            ]
-        ];
+                "conferenceSolution" => [
+                    "key" => [
+                        "type" => $request->params["conferenceSolutionConferenceSolutionKeyType"]
+                    ],
+                    "name" => $request->params["conferenceSolutionName"],
+                    "iconUri" => $request->params["conferenceSolutionIconUri"]
+                ],
+                "conferenceId" => $request->params["conferenceId"]
+            ];
+        }
+        else {
+            $calendarData = (new GoogleCalendarIntegration())->getCalendarData($accessToken, $calendarId);
+            if(!$calendarData["error"]){
+                $uniqueId = uniqid($calendarId.date("Y-m-d H:i:s"));
+                $conferenceData = [
+                    "createRequest" => [
+                        "conferenceSolutionKey" => [
+                            "type" => $calendarData["calendarData"]["conferenceProperties"]["allowedConferenceSolutionTypes"][0]
+                        ],
+                        "requestId" => $uniqueId
+                    ]
+                ];
+            }
+        }
     }
-    else
-        $createRequest = [
+    else {
+        $conferenceData = [
             "" => []
         ];
+    }
 
 
     if(!empty($request->params["eventGuests"])){
