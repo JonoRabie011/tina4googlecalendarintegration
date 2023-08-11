@@ -85,8 +85,15 @@
                 Add a virtual Google Meeting to event?
             </label>
             {% if event.conferenceData %}
-                <input type="hidden" name="createRequestId" value="{{ event.conferenceData.createRequest.requestId }}">
-                <input type="hidden" name="conferenceSolutionKeyType" value="{{ event.conferenceData.createRequest.requestId }}">
+                <input type="hidden" name="entryPointsEntryPointType" value="{{ event.conferenceData.entryPoints.0.entryPointType }}">
+                <input type="hidden" name="entryPointsUri" value="{{ event.conferenceData.entryPoints.0.uri }}">
+                <input type="hidden" name="entryPointsLabel" value="{{ event.conferenceData.entryPoints.0.label }}">
+
+                <input type="hidden" name="conferenceSolutionConferenceSolutionKeyType" value="{{ event.conferenceData.conferenceSolution.key.type }}">
+                <input type="hidden" name="conferenceSolutionName" value="{{ event.conferenceData.conferenceSolution.name }}">
+                <input type="hidden" name="conferenceSolutionIconUri" value="{{ event.conferenceData.conferenceSolution.iconUri }}">
+
+                <input type="hidden" name="conferenceId" value="{{ event.conferenceData.conferenceId }}">
             {% endif %}
         </div>
         {{ "edit-event-form" | formToken | raw }}
