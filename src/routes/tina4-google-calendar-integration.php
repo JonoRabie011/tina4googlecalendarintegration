@@ -279,9 +279,12 @@ Post::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $link
     if( ! ($accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue)) ) {
         $error = "Authentication failed, please reload page to continue.";
     }
-    else if(!($events = (new GoogleCalendarIntegration())->listEvents($accessToken, $request->params["eventCalendar"])))
+    else if(sizeof($events = (new GoogleCalendarIntegration())->listEvents($accessToken, $request->params["eventCalendar"],
+                                                                      urlencode($timeStamps["dateTimeStart"]),
+                                                                      urlencode($timeStamps["dateTimeEnd"]))) < 1)
     {
-        $error = "An error occurred. Please try again.";
+        $error = "No events found in for calendar {$request->params["eventCalendar"]} in dates ".
+                 "{$request->params["dateTimeStart"]} to {$request->params["dateTimeEnd"]}.";
     }
     else
         $error = null;
