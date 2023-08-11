@@ -102,7 +102,7 @@
     <div class="mb-3">
         <button type="submit" class="btn btn-success"
                 onclick="saveForm('edit-event-form','/google/calendar/edit-event/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}',
-                                  'edit-event-content4444')"
+                                  'edit-event-content-response')"
         >
             Update
         </button>
@@ -116,7 +116,7 @@
         </button>
     </div>
 </div>
-<div id="edit-event-content4444"></div>
+<div id="edit-event-content-response"></div>
 {% if promptLinkContacts %}
     {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
 {% endif %}
