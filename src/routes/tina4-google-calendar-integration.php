@@ -441,10 +441,19 @@ Post::add("/google/event/delete/{calendarId}/{eventId}/{linkKey}/{linkValue}",
 
     if((new GoogleCalendarIntegration())->deleteEvent($accessToken, $calendarId, $eventId, $linkKey, $linkValue))
         $message = "Event deleted.";
-    else
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                         HTTP_OK, TEXT_HTML);
+    } else {
         $message = "Failed to delete event, may have already be deleted.";
 
-    return $response($message, HTTP_OK, TEXT_HTML);
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                         HTTP_OK, TEXT_HTML);
+    }
+
+
 });
 
 
