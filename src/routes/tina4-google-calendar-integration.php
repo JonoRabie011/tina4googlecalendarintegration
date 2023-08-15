@@ -325,12 +325,15 @@ Get::add("/google/events/get/{calendarId}/{eventId}/{linkKey}/{linkValue}",
         $promptLinkContacts = false;
     }
     else{
-        setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"],time() + (86400 * 30), "/");
-        $promptLinkContacts = true;
+        setcookie("authBeforeEvent", "/google/events/list/{$linkKey}/{$linkValue}", time() + (86400 * 30), "/");
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     if($error){
-        setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
+        setcookie("authBeforeEvent", "/google/events/list/{$linkKey}/{$linkValue}", time() + (86400 * 30), "/");
 
         $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
 
@@ -338,15 +341,14 @@ Get::add("/google/events/get/{calendarId}/{eventId}/{linkKey}/{linkValue}",
                         HTTP_OK, TEXT_HTML);
     }
 
-    return $response(renderTemplate("/google-calendar-integration/edit-event.twig", ["event" => $event,
-                                                                                                 "contactList" => $contactList,
-                                                                                                 "error" => $error,
-                                                                                                 "calendarId" => urlencode($calendarId),
-                                                                                                 "eventId" => $eventId,
-                                                                                                 "linkKey" => $linkKey,
-                                                                                                 "linkValue" => $linkValue,
-                                                                                                 "promptLinkContacts" => $promptLinkContacts]),
+    return $response(renderTemplate("/google-calendar-integration/edit-event.twig",
+                                    [
+                                        "event" => $event, "contactList" => $contactList, "error" => $error,
+                                        "calendarId" => urlencode($calendarId), "eventId" => $eventId, "linkKey" => $linkKey,
+                                        "linkValue" => $linkValue, "promptLinkContacts" => $promptLinkContacts
+                                    ]),
                     HTTP_OK, TEXT_HTML);
+
 });
 
 /**
@@ -460,7 +462,19 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
     ];
 
 
-    (new GoogleCalendarIntegration())->patchEvent($accessToken, $calendarId, $eventBody, $eventId, $linkKey, $linkValue);
+    if((new GoogleCalendarIntegration())->patchEvent($accessToken, $calendarId, $eventBody, $eventId, $linkKey, $linkValue)){
+        $message = "Event saved.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
+    } else {
+        $message = "Failed to saved event, please try again.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
+    }
 
 });
 
