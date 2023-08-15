@@ -475,7 +475,7 @@ Post::add("/google/event/delete/{calendarId}/{eventId}/{linkKey}/{linkValue}",
 {
     $accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue);
 
-    if((new GoogleCalendarIntegration())->deleteEvent($accessToken, $calendarId, $eventId, $linkKey, $linkValue))
+    if((new GoogleCalendarIntegration())->deleteEvent($accessToken, $calendarId, $eventId, $linkKey, $linkValue)) {
         $message = "Event deleted.";
 
         return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
