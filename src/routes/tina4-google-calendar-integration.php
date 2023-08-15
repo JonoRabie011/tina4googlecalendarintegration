@@ -453,7 +453,7 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         "attachments" => $attachments,
         "attendees" => $attendees,
         "recurrence" => $recurrenceRule,
-        "conferenceData" => $createRequest,
+        "conferenceData" => $conferenceData,
         "summary" => $request->params["eventTitle"],
         "description" => $request->params["eventDescription"],
         "location" => $request->params["eventLocation"]
