@@ -1,6 +1,7 @@
 {% extends "base.twig" %}
+{%  set title = "Events" %}
 {% block content %}
-    <div class="d-flex justify-content-center">
+    <div class="container">
         <div id="content" class="">
             <div class="mb-3">
                 <h4>List Events</h4>
@@ -23,22 +24,11 @@
             <div class="mb-3">
                 <button class="btn btn-success" onclick="fetchEvents('{{ linkKey }}', '{{ linkValue }}')">Fetch</button>
             </div>
-            <div class="container">
-                <div id="eventsList" class="row">
-                </div>
+            <div id="eventsList" class="row">
             </div>
         </div>
     </div>
     <script>
-        function loadCalendarEvent(url){
-            $.ajax({
-                url: url,
-                data: "",
-                method: "get"
-            }).done(function (response) {
-                document.getElementById("content").innerHTML = response.data;
-                eval(response.selectizeJs);
-            });
-        }
+        console.log('events.twig');
     </script>
 {% endblock %}

@@ -2,9 +2,9 @@
     <h4>Edit A Calendar Event</h4>
 </div>
 <div class="row mb-3">
-    <a class="btn btn-primary" onclick="loadPage('/google/events/list/{{ linkKey }}/{{ linkValue }}','content')">
+    <button class="btn btn-primary" onclick="loadPage('/google/events/list/{{ linkKey }}/{{ linkValue }}','content')">
         Back To List Events
-    </a>
+    </button>
 </div>
 <div id="edit-event-content">
     <form id="edit-event-form">
@@ -120,3 +120,18 @@
 {% if promptLinkContacts %}
     {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
 {% endif %}
+
+<script>
+    $('#eventGuests').selectize({
+        create: true,
+        valueField: "value",
+        labelField: "name",
+        sortField: "name",
+        searchField: "name",
+        delimiter: ",",
+        selectOnTab: false,
+        onItemAdd: function () {
+            $('#eventGuests-selectized').focus();
+        }
+    });
+</script>
