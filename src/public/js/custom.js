@@ -84,8 +84,3 @@ function showSpinner(targetDiv,show=true){
         $('#' + targetDiv).html('');
     }
 }
-
-function fetchEvents(linkKey, linkValue){
-    showSpinner('eventsList');
-    saveForm("get-events-form",'/google/events/list/'+linkKey+'/'+linkValue,"eventsList");
-}

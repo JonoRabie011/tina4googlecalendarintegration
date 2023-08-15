@@ -22,13 +22,39 @@
                 {{ "get-events-form" | formToken | raw }}
             </form>
             <div class="mb-3">
-                <button class="btn btn-success" onclick="fetchEvents('{{ linkKey }}', '{{ linkValue }}')">Fetch</button>
+                <button class="btn btn-success" onclick="saveForm('get-events-form','/google/events/list/{{ linkKey }}/{{ linkValue }}','eventsList')">Fetch</button>
             </div>
             <div id="eventsList" class="row">
             </div>
         </div>
     </div>
     <script>
-        console.log('events.twig');
+        $('#get-events-form #dateTimeStart').daterangepicker({
+            singleDatePicker: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            showDropdowns: true,
+            minYear: 2023,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            startDate: moment().startOf('day'),
+            locale: {
+                format: 'dddd, MMM DD HH:mm'
+            }
+        });
+
+        $('#get-events-form #dateTimeEnd').daterangepicker({
+            singleDatePicker: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            showDropdowns: true,
+            minYear: 2023,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            startDate: moment().startOf('day').add(1439, 'minutes'),       //until 23:59 the same day
+            locale: {
+                format: 'dddd, MMM DD HH:mm'
+            }
+        });
+
+        $('#get-events-form #timeZone').val(Intl.DateTimeFormat().resolvedOptions().timeZone);
     </script>
 {% endblock %}
