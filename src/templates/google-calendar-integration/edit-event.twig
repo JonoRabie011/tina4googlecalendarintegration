@@ -2,9 +2,9 @@
     <h4>Edit A Calendar Event</h4>
 </div>
 <div class="row mb-3">
-    <a class="btn btn-primary" onclick="loadPage('/google/events/list/{{ linkKey }}/{{ linkValue }}','content')">
+    <button class="btn btn-primary" onclick="loadPage('/google/events/list/{{ linkKey }}/{{ linkValue }}','content')">
         Back To List Events
-    </a>
+    </button>
 </div>
 <div id="edit-event-content">
     <form id="edit-event-form">
@@ -56,7 +56,7 @@
         <div class="mb-3">
             <label for="eventRecurrence" class="form-label">Recurrence</label>
             <select id="eventRecurrence" name="eventRecurrence" class="form-control" onchange="">
-                <option selected disabled>Select</option>
+                <option selected disabled value="">Select</option>
                 <option value="RRULE:FREQ=DAILY" {{ event.recurrence.0 == 'RRULE:FREQ=DAILY' ? 'selected' : '' }} >Daily</option>
                 <option value="RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE"
                         {{ event.recurrence.0 == 'RRULE:FREQ=WEEKLY;BYDAY=FR,MO,TH,TU,WE' ? 'selected' : '' }}
@@ -85,17 +85,24 @@
                 Add a virtual Google Meeting to event?
             </label>
             {% if event.conferenceData %}
-                <input type="hidden" name="createRequestId" value="{{ event.conferenceData.createRequest.requestId }}">
-                <input type="hidden" name="conferenceSolutionKeyType" value="{{ event.conferenceData.createRequest.requestId }}">
+                <input type="hidden" name="entryPointsEntryPointType" value="{{ event.conferenceData.entryPoints.0.entryPointType }}">
+                <input type="hidden" name="entryPointsUri" value="{{ event.conferenceData.entryPoints.0.uri }}">
+                <input type="hidden" name="entryPointsLabel" value="{{ event.conferenceData.entryPoints.0.label }}">
+
+                <input type="hidden" name="conferenceSolutionConferenceSolutionKeyType" value="{{ event.conferenceData.conferenceSolution.key.type }}">
+                <input type="hidden" name="conferenceSolutionName" value="{{ event.conferenceData.conferenceSolution.name }}">
+                <input type="hidden" name="conferenceSolutionIconUri" value="{{ event.conferenceData.conferenceSolution.iconUri }}">
+
+                <input type="hidden" name="conferenceId" value="{{ event.conferenceData.conferenceId }}">
             {% endif %}
         </div>
         {{ "edit-event-form" | formToken | raw }}
     </form>
 
     <div class="mb-3">
-        <button type="submit" class="btn btn-success"
+        <button type="button" class="btn btn-success"
                 onclick="saveForm('edit-event-form','/google/calendar/edit-event/{{ calendarId }}/{{ eventId }}/{{ linkKey }}/{{ linkValue }}',
-                                  'edit-event-content4444')"
+                                  'edit-event-content')"
         >
             Update
         </button>
@@ -109,7 +116,21 @@
         </button>
     </div>
 </div>
-<div id="edit-event-content4444"></div>
 {% if promptLinkContacts %}
     {% include "google-calendar-integration/prompt-consent.twig" with {linkKey: linkKey, linkValue: linkValue} %}
 {% endif %}
+
+<script>
+    $('#eventGuests').selectize({
+        create: true,
+        valueField: "value",
+        labelField: "name",
+        sortField: "name",
+        searchField: "name",
+        delimiter: ",",
+        selectOnTab: false,
+        onItemAdd: function () {
+            $('#eventGuests-selectized').focus();
+        }
+    });
+</script>

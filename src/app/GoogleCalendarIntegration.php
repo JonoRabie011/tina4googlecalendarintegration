@@ -256,10 +256,10 @@ class GoogleCalendarIntegration extends \Tina4\Api
      * @param $calendarId
      * @return mixed
      */
-    public function listEvents($accessToken, $calendarId) : mixed
+    public function listEvents($accessToken, $calendarId, $startTime, $endTime) : mixed
     {
         $this->authHeader = "Authorization: Bearer " . $accessToken;
-        $result =  $this->sendRequest("/{$calendarId}/events");
+        $result =  $this->sendRequest("/{$calendarId}/events?timeMax={$endTime}&timeMin={$startTime}");
 
         if($result["httpCode"] == 200)
         {

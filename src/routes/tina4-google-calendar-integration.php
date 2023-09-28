@@ -153,7 +153,7 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if(isset($request->params["addMeetingToEvent"])){
+    if($request->params["addMeetingToEvent"]){
         $calendarData = $googleCalendarIntegration->getCalendarData($accessToken, $request->params["eventCalendar"]);
         if(!$calendarData["error"]){
             $uniqueId = uniqid($request->params["eventCalendar"].date("Y-m-d H:i:s"));
@@ -177,7 +177,7 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
         ];
 
 
-    if(!empty($request->params["eventGuests"])){
+    if(!empty($request->params["eventGuests"]["0"])){
         foreach ($request->params["eventGuests"] as $guestEmail) {
             $attendees[] = [
                 "additionalGuests" => 0,
@@ -226,9 +226,17 @@ Post::add("/google/calendar/create-event/{linkKey}/{linkValue}", function ($link
                                                         $linkKey, $linkValue) )
     {
         $message = "Event created.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
     }
     else {
         $message = "Failed to create event";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     return $response($message, HTTP_OK, TEXT_HTML);
@@ -267,13 +275,22 @@ Get::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $linkV
  */
 Post::add("/google/events/list/{linkKey}/{linkValue}", function ($linkKey, $linkValue, Response $response, Request $request)
 {
+    $googleCalendarIntegration = new GoogleCalendarIntegration();
+    $request->params["timeZone"] = $googleCalendarIntegration->getTimeZoneOffset($request->params["timeZone"]);
+    $timeStamps = $googleCalendarIntegration->convertTimeStamp(["dateTimeStart" => $request->params["dateTimeStart"],
+                                                                "dateTimeEnd" => $request->params["dateTimeEnd"]],
+                                                                $request->params["timeZone"]);
+
     $events = [];
     if( ! ($accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue)) ) {
         $error = "Authentication failed, please reload page to continue.";
     }
-    else if(!($events = (new GoogleCalendarIntegration())->listEvents($accessToken, $request->params["eventCalendar"])))
+    else if(sizeof($events = (new GoogleCalendarIntegration())->listEvents($accessToken, $request->params["eventCalendar"],
+                                                                      urlencode($timeStamps["dateTimeStart"]),
+                                                                      urlencode($timeStamps["dateTimeEnd"]))) < 1)
     {
-        $error = "An error occurred. Please try again.";
+        $error = "No events found in for calendar {$request->params["eventCalendar"]} in dates ".
+                 "{$request->params["dateTimeStart"]} to {$request->params["dateTimeEnd"]}.";
     }
     else
         $error = null;
@@ -308,12 +325,15 @@ Get::add("/google/events/get/{calendarId}/{eventId}/{linkKey}/{linkValue}",
         $promptLinkContacts = false;
     }
     else{
-        setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"],time() + (86400 * 30), "/");
-        $promptLinkContacts = true;
+        setcookie("authBeforeEvent", "/google/events/list/{$linkKey}/{$linkValue}", time() + (86400 * 30), "/");
+        $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
+
+        return $response(renderTemplate("/google-calendar-integration/components/auth-screen.twig", ["authLink" => $link]),
+                        HTTP_OK, TEXT_HTML);
     }
 
     if($error){
-        setcookie("authBeforeEvent", $_SERVER["REQUEST_URI"], time() + (86400 * 30), "/");
+        setcookie("authBeforeEvent", "/google/events/list/{$linkKey}/{$linkValue}", time() + (86400 * 30), "/");
 
         $link = "/google/calendar/integration/all/{$linkKey}/{$linkValue}";
 
@@ -321,15 +341,14 @@ Get::add("/google/events/get/{calendarId}/{eventId}/{linkKey}/{linkValue}",
                         HTTP_OK, TEXT_HTML);
     }
 
-    return $response(renderTemplate("/google-calendar-integration/edit-event.twig", ["event" => $event,
-                                                                                                 "contactList" => $contactList,
-                                                                                                 "error" => $error,
-                                                                                                 "calendarId" => urlencode($calendarId),
-                                                                                                 "eventId" => $eventId,
-                                                                                                 "linkKey" => $linkKey,
-                                                                                                 "linkValue" => $linkValue,
-                                                                                                 "promptLinkContacts" => $promptLinkContacts]),
+    return $response(renderTemplate("/google-calendar-integration/edit-event.twig",
+                                    [
+                                        "event" => $event, "contactList" => $contactList, "error" => $error,
+                                        "calendarId" => urlencode($calendarId), "eventId" => $eventId, "linkKey" => $linkKey,
+                                        "linkValue" => $linkValue, "promptLinkContacts" => $promptLinkContacts
+                                    ]),
                     HTTP_OK, TEXT_HTML);
+
 });
 
 /**
@@ -355,23 +374,50 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         $attachments = [];
 
     // If Event being created requires Hangouts or Google Meet conference
-    if(isset($request->params["addMeetingToEvent"])){
-        $createRequest = [
-            "createRequest" => [
-                "conferenceSolutionKey" => [
-                    "type" => $request->params["conferenceSolutionKeyType"]
+    if($request->params["addMeetingToEvent"]){
+        if (isset($request->params["entryPointsEntryPointType"]))
+        {
+            $conferenceData = [
+                "entryPoints" => [
+                    "0" => [
+                        "entryPointType" => $request->params["entryPointsEntryPointType"],
+                        "uri" => $request->params["entryPointsUri"],
+                        "label" => $request->params["entryPointsLabel"],
+                    ]
                 ],
-                "requestId" => $request->params["createRequestId"]
-            ]
-        ];
+                "conferenceSolution" => [
+                    "key" => [
+                        "type" => $request->params["conferenceSolutionConferenceSolutionKeyType"]
+                    ],
+                    "name" => $request->params["conferenceSolutionName"],
+                    "iconUri" => $request->params["conferenceSolutionIconUri"]
+                ],
+                "conferenceId" => $request->params["conferenceId"]
+            ];
+        }
+        else {
+            $calendarData = (new GoogleCalendarIntegration())->getCalendarData($accessToken, $calendarId);
+            if(!$calendarData["error"]){
+                $uniqueId = uniqid($calendarId.date("Y-m-d H:i:s"));
+                $conferenceData = [
+                    "createRequest" => [
+                        "conferenceSolutionKey" => [
+                            "type" => $calendarData["calendarData"]["conferenceProperties"]["allowedConferenceSolutionTypes"][0]
+                        ],
+                        "requestId" => $uniqueId
+                    ]
+                ];
+            }
+        }
     }
-    else
-        $createRequest = [
+    else {
+        $conferenceData = [
             "" => []
         ];
+    }
 
 
-    if(!empty($request->params["eventGuests"])){
+    if(!empty($request->params["eventGuests"]["0"])){
         foreach ($request->params["eventGuests"] as $guestEmail) {
             $attendees[] = [
                 "additionalGuests" => 0,
@@ -409,14 +455,26 @@ Post::add("/google/calendar/edit-event/{calendarId}/{eventId}/{linkKey}/{linkVal
         "attachments" => $attachments,
         "attendees" => $attendees,
         "recurrence" => $recurrenceRule,
-        "conferenceData" => $createRequest,
+        "conferenceData" => $conferenceData,
         "summary" => $request->params["eventTitle"],
         "description" => $request->params["eventDescription"],
         "location" => $request->params["eventLocation"]
     ];
 
 
-    (new GoogleCalendarIntegration())->patchEvent($accessToken, $calendarId, $eventBody, $eventId, $linkKey, $linkValue);
+    if((new GoogleCalendarIntegration())->patchEvent($accessToken, $calendarId, $eventBody, $eventId, $linkKey, $linkValue)){
+        $message = "Event saved.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
+    } else {
+        $message = "Failed to saved event, please try again.";
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                        HTTP_OK, TEXT_HTML);
+    }
 
 });
 
@@ -431,12 +489,21 @@ Post::add("/google/event/delete/{calendarId}/{eventId}/{linkKey}/{linkValue}",
 {
     $accessToken = (new GoogleCalendarAuth())->getAccessToken($linkKey, $linkValue);
 
-    if((new GoogleCalendarIntegration())->deleteEvent($accessToken, $calendarId, $eventId, $linkKey, $linkValue))
+    if((new GoogleCalendarIntegration())->deleteEvent($accessToken, $calendarId, $eventId, $linkKey, $linkValue)) {
         $message = "Event deleted.";
-    else
+
+        return $response(renderTemplate("/google-calendar-integration/components/messages/success.twig",
+                                        ["message" => $message]),
+                         HTTP_OK, TEXT_HTML);
+    } else {
         $message = "Failed to delete event, may have already be deleted.";
 
-    return $response($message, HTTP_OK, TEXT_HTML);
+        return $response(renderTemplate("/google-calendar-integration/components/messages/failed.twig",
+                                        ["message" => $message]),
+                         HTTP_OK, TEXT_HTML);
+    }
+
+
 });
 
 

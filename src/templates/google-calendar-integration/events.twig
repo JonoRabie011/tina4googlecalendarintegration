@@ -1,36 +1,60 @@
 {% extends "base.twig" %}
+{%  set title = "Events" %}
 {% block content %}
-    <div class="d-flex justify-content-center">
+    <div class="container">
         <div id="content" class="">
             <div class="mb-3">
                 <h4>List Events</h4>
             </div>
             <form id="get-events-form">
                 <div class="mb-3">
+                    <label for="dateTimeStart" class="form-label">From</label>
+                    <input id="dateTimeStart" type="text" class="form-control" placeholder="Select start" name="dateTimeStart">
+                </div>
+                <div class="mb-3">
+                    <label for="dateTimeEnd" class="form-label">Until</label>
+                    <input id="dateTimeEnd" type="text" class="form-control" placeholder="Select end" name="dateTimeEnd">
+                </div>
+                <div class="mb-3">
                     {% include "google-calendar-integration/components/calendar-list.twig" with {calendars: calendars} %}
                 </div>
-                <input type="hidden" id="timeZone" name="timeZone" value="{{ linkValue }}">
+                <input type="hidden" id="timeZone" name="timeZone">
                 {{ "get-events-form" | formToken | raw }}
             </form>
             <div class="mb-3">
-                <button class="btn btn-success" onclick="fetchEvents('{{ linkKey }}', '{{ linkValue }}')">Fetch</button>
+                <button class="btn btn-success" onclick="saveForm('get-events-form','/google/events/list/{{ linkKey }}/{{ linkValue }}','eventsList')">Fetch</button>
             </div>
-            <div class="container">
-                <div id="eventsList" class="row">
-                </div>
+            <div id="eventsList" class="row">
             </div>
         </div>
     </div>
     <script>
-        function loadCalendarEvent(url){
-            $.ajax({
-                url: url,
-                data: "",
-                method: "get"
-            }).done(function (response) {
-                document.getElementById("content").innerHTML = response.data;
-                eval(response.selectizeJs);
-            });
-        }
+        $('#get-events-form #dateTimeStart').daterangepicker({
+            singleDatePicker: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            showDropdowns: true,
+            minYear: 2023,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            startDate: moment().startOf('day'),
+            locale: {
+                format: 'dddd, MMM DD HH:mm'
+            }
+        });
+
+        $('#get-events-form #dateTimeEnd').daterangepicker({
+            singleDatePicker: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            showDropdowns: true,
+            minYear: 2023,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            startDate: moment().startOf('day').add(1439, 'minutes'),       //until 23:59 the same day
+            locale: {
+                format: 'dddd, MMM DD HH:mm'
+            }
+        });
+
+        $('#get-events-form #timeZone').val(Intl.DateTimeFormat().resolvedOptions().timeZone);
     </script>
 {% endblock %}
